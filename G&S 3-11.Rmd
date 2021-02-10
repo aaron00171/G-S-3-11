@@ -1,0 +1,66 @@
+---
+title: "G&S 3-11"
+author: "Jiaheng Li"
+date: "2021/2/10"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+In order to meet our requirement, we need $\alpha$ enter the box from the bottom and exist from the top. Thus, these power curves also need to enter the box from the bottom. If a curve doesn't enter from the bottom, then the value of $\alpha(0.6)$ will be higher than 0.05 which the probablity of leading to a type I would be higher than 5 percent. Similarly, if a curve doesn't exist from the top, the value of $\alpha(0.8)$ will be lower than 0.95, then the probablity of type II error $1-\alpha(0.8)$ would be higher than 0.05.
+
+We will be using the equation of $$\alpha=\sum_{k=m}^{n}{b(n,p,k)}$$ to calcluate the value of m for both of the situations.
+
+(1) n=100, p=0.6 $\alpha=0.05$, then $$0.05=\sum_{k=m}^{n}{b(100,0.6,k)}$$ 
+
+```{r}
+biterm<-function(n,p,k){
+  t=choose(n,k)*(p^k)*(1-p)^(n-k)
+}
+a=100
+p1=0.6
+n=100
+term=biterm(n,p1,a)
+while (term<0.05) {
+ a=a-1
+  term=term+biterm(n,p1,a)
+}
+print(a+1)
+```
+The smallest value of m is 69.
+
+(2) n=100, p=0.8 $\alpha=0.95$, then $$0.95=\sum_{k=m}^{n}{b(100,0.8,k)}$$
+```{r}
+a=100
+p2=0.8
+n=100
+term=biterm(n,p2,a)
+while (term<0.95) {
+  a=a-1
+  term=term+biterm(n,p2,a)
+}
+print(a)
+```
+The largest value of m is 73.
+
+Figure 3.7
+```{r}
+x<-seq(0.4,1,0.001)
+alpha<-function(m,n,p){
+  t=0
+  for (i in m:n) {t=t+biterm(n,p,i)}
+  return(t)
+}
+y <- alpha(69,100,x)
+y1 <- alpha(73,100,x)
+plot(x,y,col="gold",pch=16,cex=0.1,ylab="",main="Power Curve")
+points(c(0.6,0.6,0.8,0.8),c(0.05,0.95,0.95,0.05),pch=19,cex=0.1)
+lines(c(0.6,0.6,0.8,0.8,0.6),c(0.05,0.95,0.95,0.05,0.05),lty=2)
+points(x,y1,col="deepskyblue",pch=16,cex=0.1)
+lines(x,y1,col="deepskyblue",lty=1,cex=1)
+lines(x,y,col="gold",lty=1,cex=1)
+```
+
